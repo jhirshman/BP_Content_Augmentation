@@ -3,7 +3,7 @@ Google = require "./google"
 module.exports = class HyperPhysics extends Google
    
     constructor: (limit) ->
-        super
+        super limit
         @subjects.science = true
         
         @workerID = "hp"

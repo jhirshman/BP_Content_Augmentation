@@ -8,7 +8,8 @@ module.exports = class Worker
             host: "",
             port: 80,
             path: "",
-            "user-agent": "BenchPrep content augmentation client contact @ chicago@benchprep.com"
+            headers: {"user-agent": "BenchPrep content augmentation client contact @ chicago@benchprep.com"}
+
         }
         @pathParts = {
             base: "",
@@ -28,46 +29,44 @@ module.exports = class Worker
         
      
     query: (query, callback) ->
-        worker = @ 
+        worker = @
+        @queryText = query
+        @callback = callback
         
-        @callback = callback 
-        @enterQueryinPath query 
+        @enterQueryinPath query
         
         @requestOptions.path = @pathParts.base + queryString.stringify(@pathParts.options)
-        #console.log @requestOptions.path
-        
-        http.get @requestOptions, (response) ->
+        req = http.get @requestOptions, (response) ->
             text = "";
             
             response.on "data", (data) ->
                 text += data
             
             response.on "end", () ->
-                console.log text
-                jsonData = eval ('(' + text + ')')
+                
+                try
+                    jsonData = eval ('(' + text + ')')
+                
+                catch e
+                    worker.callback "not valid JSON", ""
+                
                 worker.validateData jsonData, (valid, outputData) ->
-                    if valid == true
-                        worker.callback true, outputData
+                    worker.valid = valid
+                    worker.output = outputData
+                    if valid == "true" 
+                        worker.callback "true", outputData
                     else
-                        worker.callback false, ""
-
-    enterQueryinPath: (query) ->
+                        worker.callback valid, ""
+        
+    enterQueryinPath: () ->
+        return @queryText
 
     validateData: (jsonData, callback) ->
 
     getOutput: () ->
-
-    formatResult: (title, content, author, source, url) ->
-        result = {
-            title: title,
-            content: content,
-            author: author,
-            source: source,
-            url: url
-        }
-        
-        return result
         
     applyLimit: (output) ->
+        if @limit < 1
+            return output[0...1]
         return output[ 0...@limit ]
         

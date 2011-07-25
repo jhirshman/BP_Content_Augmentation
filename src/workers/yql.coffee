@@ -20,9 +20,10 @@ module.exports = class Yql extends Worker
         @workerName = "Yahoo Query Language"
         
     validateData: (jsonData, callback) ->
-        if !jsonData.query?.count? || jsonData.query.count < 1
-            callback false, ""
-        
+        if !jsonData.query?.count?
+            callback "errorWithJSONObject", ""
+        else if jsonData.query.count < 1
+            callback "no results", ""    
         else
-            callback true, @getOutput(jsonData.query.results)
+            callback "true", @getOutput(jsonData.query.results)
 

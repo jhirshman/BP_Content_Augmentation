@@ -6,4 +6,4 @@ module.exports = class TermExtractor extends Yql
     enterQueryinPath: (query) ->      
         @pathParts.options.q =  'select * from search.termextract where context="'+ query + '"'
     getOutput: (results) ->
-        return results.Result
+        return @applyLimit results.Result

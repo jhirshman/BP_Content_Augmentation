@@ -4,22 +4,43 @@ WolframMathWorld = require './workers/wolframMathWorld'
 HyperPhysics = require './workers/hyperPhysics'
 Owl = require './workers/owl'
 Wikipedia = require './workers/wikipedia'
+Database = require './utilities/database'
+FileUtility = require './utilities/fileUtility'
+
+Database.clear()
 
 workers = {
-    youtube: new Youtube(1),
-    termExtract: new TermExtractor(1),
-    wolframMW: new WolframMathWorld(1),
-    hyperPhysics: new HyperPhysics(1),
-    owl: new Owl(1)
-    wikipedia: new Wikipedia(1)
+    youtube: () ->
+        return new Youtube(1)
+    termExtract: () ->
+        return new TermExtractor(2)
+    wolframMW: () ->
+        return new WolframMathWorld(1)
+    hyperPhysics: () ->
+        return new HyperPhysics(1)
+    owl: () ->
+        return new Owl(1)
+    wikipedia: () ->
+        return new Wikipedia(1)
 }
 
-for name, worker of workers
-    if name == "wikipedia"
-        worker.query "triangles", (valid, output) ->
-            if valid
-                console.log "valid"
-                console.log output
-            else
-                console.log "invalid"
-        
+if true
+    fileUtility = new FileUtility
+    filePath = __dirname+"/testHTML.html"
+    fileUtility.readAndStripHTML filePath, (text) ->
+        workers.termExtract().query text, (valid, output) ->
+            if valid != "true"
+                throw "error with extraction"
+            for term in output
+                for name, worker of workers
+                    myWorker = worker()
+                    if myWorker.subjects.science == true || myWorker.subjects.all == true
+                        console.log "***"+name+": "+term
+                        myWorker.query term, (valid, results) ->
+                            if valid == "true"
+                                #console.log "valid"
+                                for data in results
+                                    Database.insertIntoDB(data)
+                            else
+                                console.log valid
+

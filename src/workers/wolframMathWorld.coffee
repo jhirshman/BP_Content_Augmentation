@@ -3,7 +3,7 @@ Google = require "./google"
 module.exports = class WolframMathWorld extends Google
     
     constructor: (limit) ->
-        super
+        super limit
         @subjects.math = true
         
         @workerID = "wmw"

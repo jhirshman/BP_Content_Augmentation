@@ -22,5 +22,6 @@ module.exports = class Youtube extends Yql
                 source: @siteName
                 url: video.url
                 workerID: @workerID
+                queryText: @queryText
             }
         return @applyLimit output

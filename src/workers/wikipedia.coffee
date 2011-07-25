@@ -3,7 +3,7 @@ Worker = require "./worker"
 module.exports = class Wikipedia extends Worker
     
     constructor: (limit) ->   
-        super
+        super limit
         
         @requestOptions.host = "en.wikipedia.org"       
         @pathParts.base = "/w/api.php?"       
@@ -32,12 +32,14 @@ module.exports = class Wikipedia extends Worker
                 source: @siteName
                 url: "en.wikipedia.org/wiki/" + result
                 workerID: @workerID
-            }   
+                queryText: @queryText
+            }
         return @applyLimit output
     
     validateData: (jsonData, callback) ->
-        if !jsonData[1]? || jsonData[1].length < 1
-            callback false, ""
-        
+        if !jsonData[1]?
+            callback "errorWithJSONObject", ""
+        else if jsonData[1].length < 1
+            callback "no results", ""      
         else
-            callback true, @getOutput(jsonData[1])
+            callback "true", @getOutput(jsonData[1])

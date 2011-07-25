@@ -3,7 +3,7 @@ Worker = require "./worker"
 module.exports = class Google extends Worker
     
     constructor: (limit) ->   
-        super
+        super limit
         
         @requestOptions.host = "ajax.googleapis.com"       
         @pathParts.base = "/ajax/services/search/web?"       
@@ -28,12 +28,14 @@ module.exports = class Google extends Worker
                 source: @siteName
                 url: result.url
                 workerID: @workerID
+                queryText: @queryText
             }   
         return @applyLimit output
     
     validateData: (jsonData, callback) ->
-        if !jsonData.responseData?.results? || jsonData.responseData.results < 1
-            callback false, ""
-        
+        if !jsonData.responseData?.results?
+            callback "errorWithJSONObject", ""
+        else if jsonData.responseData.results < 1
+            callback "no results", ""
         else
-            callback true, @getOutput(jsonData.responseData.results)
+            callback "true", @getOutput(jsonData.responseData.results)

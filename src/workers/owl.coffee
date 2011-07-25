@@ -3,7 +3,7 @@ Google = require "./google"
 module.exports = class Owl extends Google
    
     constructor: (limit) ->
-        super
+        super limit
         @subjects.english = true
         @subjects.writing = true
         
