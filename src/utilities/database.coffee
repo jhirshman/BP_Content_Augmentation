@@ -40,7 +40,8 @@ exports.insertIntoDB = (data) ->
 exports.printDB = () ->
     Content.find {}, (err, docs) ->
         for doc in docs
-            console.log doc.title + " : " + doc.source
+            console.log doc.title + " : " + doc.source + " - " + doc.url
+            console.log ""
             #eyes.inspect doc
 
 
